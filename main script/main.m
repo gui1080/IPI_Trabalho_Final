@@ -3,13 +3,15 @@
 %  Gabriel Preihs - xx/xxxxxxx        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% precaução ao rodar este script com imagens com dimensões ímpares
+
 clear all;
 close all;
 clc;
 
-RGB = imread('FFVII.jpg');
+% carregamos a imagem, passamos para YCbCr
+RGB = imread('undertale.png');
 YCBCR = rgb2ycbcr(RGB);
-[h, w] = size(RGB);
 
 figure
 imshow(YCBCR);
@@ -17,6 +19,7 @@ title('Image in YCbCr Color Space');
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% dividimos os canais
 Y = YCBCR(:, :, 1);
 Cb = YCBCR(:, :, 2);
 Cr = YCBCR(:, :, 3);
@@ -26,18 +29,54 @@ imshow(Y);
 title('Y (grayscale)');
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%aplicamos transformada wavelet na imagem toda e no coeficiente de
+%aproximação
 wavename = 'haar';
 [cAprox,cHor,cVer,cDiag] = dwt2(im2double(Y),wavename);
+[cAprox_aux,cHor_aux,cVer_aux,cDiag_aux] = dwt2(im2double(cAprox),wavename);
 
-cAprox_small = imresize(cAprox, 0.5);
-cHor_small = imresize(cHor, 0.5);
-cVer_small = imresize(cVer, 0.5);
-cDiag_small = imresize(cDiag, 0.5);
+% nivel 2 é o quadrante superior direito
+nivel_2 = [cAprox_aux,cHor_aux; cVer_aux,cDiag_aux];
+backup = nivel_2;
 
-image_aux = ([cAprox_small,cHor_small; cVer_small,cDiag_small]);
+% aqui mostramos apenas o quadrante superior direito
+%figure
+%imshow(nivel_2);
+%title('backup');
 
-figure
-imshow(image_aux);
-title('image aux');
+%atualizamos o tamanho para caber na imagem final
+Cb_small = imresize(Cb, 0.5);
+Cr_small = imresize(Cr, 0.5);
+
+% essa imagem serve como auxiliar, até para recuperarmos as dimensões da
+% foto
+image_aux = ([backup, Cb_small; Cr_small,  cDiag]);
+
+%figure
+%imshow(image_aux);
+%title('image aux');
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% recuperamos as dimensões
+sX = size(image_aux);
+
+%wavelet inversa
+image_inv_wavelet = idwt2(backup,Cb_small,Cr_small,cDiag,'db4',sX);
+
+%mostramos
+figure
+imshow(image_inv_wavelet);
+title('reverse wavelet');
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%wavelet inversa da wavelet inversa
+
+[novo_cAprox,novo_cHor,novo_cVer,novo_cDiag] = dwt2(im2double(image_inv_wavelet),wavename);
+
+novo = [novo_cAprox,novo_cHor ; novo_cVer,novo_cDiag];
+
+figure
+imshow(novo);
+title('novo');
