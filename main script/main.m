@@ -10,7 +10,7 @@ close all;
 clc;
 
 % carregamos a imagem, passamos para YCbCr
-RGB = imread('undertale.png');
+RGB = imread('FFVII.jpg');
 YCBCR = rgb2ycbcr(RGB);
 
 figure
@@ -24,6 +24,8 @@ Y = YCBCR(:, :, 1);
 Cb = YCBCR(:, :, 2);
 Cr = YCBCR(:, :, 3);
 
+sX = size(Y);
+
 figure
 imshow(Y);
 title('Y (grayscale)');
@@ -36,22 +38,17 @@ wavename = 'haar';
 [cAprox,cHor,cVer,cDiag] = dwt2(im2double(Y),wavename);
 [cAprox_aux,cHor_aux,cVer_aux,cDiag_aux] = dwt2(im2double(cAprox),wavename);
 
-% nivel 2 é o quadrante superior direito
+% nivel 2 é o quadrante superior esquerdo
 nivel_2 = [cAprox_aux,cHor_aux; cVer_aux,cDiag_aux];
-backup = nivel_2;
 
 % aqui mostramos apenas o quadrante superior direito
 %figure
 %imshow(nivel_2);
-%title('backup');
+%title('nivel 2');
 
 %atualizamos o tamanho para caber na imagem final
 Cb_small = imresize(Cb, 0.5);
 Cr_small = imresize(Cr, 0.5);
-
-% essa imagem serve como auxiliar, até para recuperarmos as dimensões da
-% foto
-image_aux = ([backup, Cb_small; Cr_small,  cDiag]);
 
 %figure
 %imshow(image_aux);
@@ -59,15 +56,16 @@ image_aux = ([backup, Cb_small; Cr_small,  cDiag]);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % recuperamos as dimensões
-sX = size(image_aux);
 
 %wavelet inversa
-image_inv_wavelet = idwt2(backup,Cb_small,Cr_small,cDiag,'db4',sX);
+image_inv_wavelet = idwt2(nivel_2,Cb_small,Cr_small,cDiag,wavename,sX);
 
 %mostramos
 figure
 imshow(image_inv_wavelet);
 title('reverse wavelet');
+% Esta é a imagem final a se analisar
+% a imagem texturizada com tons de cinza
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
