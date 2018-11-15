@@ -26,8 +26,18 @@ imshow(Y);
 title('Y (grayscale)');
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+wavename = 'haar';
+[cAprox,cHor,cVer,cDiag] = dwt2(im2double(Y),wavename);
 
-[cAprox,cHor,cVer,cDiag] = dwt2(Y,'sym4','mode','per');
+cAprox_small = imresize(cAprox, 0.5);
+cHor_small = imresize(cHor, 0.5);
+cVer_small = imresize(cVer, 0.5);
+cDiag_small = imresize(cDiag, 0.5);
 
+image_aux = ([cAprox_small,cHor_small; cVer_small,cDiag_small]);
 
+figure
+imshow(image_aux);
+title('image aux');
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
