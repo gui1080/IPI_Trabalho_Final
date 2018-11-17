@@ -1,1 +1,1 @@
-# Trabalho Final de Introdução a Processamento de Imagens
+# Trabalho Final de IPI, Color to gray and back: Color embedding into textured gray images
