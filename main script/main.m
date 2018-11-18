@@ -1,5 +1,7 @@
 function [ A ] = main( img_principal )
 
+% escrever como argumento: imread('sua_imagem.jpg')
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Guilherme Braga Pinto - 17/0162290                     %
 %  Gabriel Preihs Benvindo de Oliveira- 17/0103595        %
@@ -37,8 +39,10 @@ title('Y (grayscale)');
 % aplicamos transformada wavelet na imagem toda e no coeficiente de
 % aproximacao
 
-wavename = 'haar';
-[LoD,HiD] = wfilters('haar','d');
+% candidatas de wavelets menos piores: haar (a melhor), fk4, db2.  
+% testest com a imagem FFVII_cover.jpg
+
+[LoD,HiD] = wfilters('haar', 'd');
 [cAprox,cHor,cVer,cDiag] = dwt2(Y, LoD, HiD, 'mode', 'symh');
 [cAprox_aux,cHor_aux,cVer_aux,cDiag_aux] = dwt2(cAprox, LoD, HiD, 'mode', 'symh');
 
@@ -71,7 +75,7 @@ title 'Cr inicial cortado';
 % recuperamos as dimensoes
 
 %wavelet inversa
-image_inv_wavelet = idwt2(nivel_2,Cb_small,Cr_small,cDiag,wavename,sX);
+image_inv_wavelet = idwt2(nivel_2,Cb_small,Cr_small,cDiag,LoD,HiD,sX);
 
 % Esta eh a imagem final a se analisar
 % (a imagem texturizada com tons de cinza)
@@ -122,7 +126,7 @@ upperRight = imcrop(cAprox_novo, [col3 row1 columns - col2 row2]);
 lowerLeft = imcrop(cAprox_novo, [col1 row3 col2 row2]);
 lowerRight = imcrop(cAprox_novo, [col3 row3 columns - col2 rows - row2]);
 
-Y_novo = idwt2(upperLeft, upperRight,lowerLeft ,lowerRight,wavename,sK);
+Y_novo = idwt2(upperLeft, upperRight,lowerLeft ,lowerRight,LoD,HiD,sK);
 
 figure
 subplot(3,1,1);
