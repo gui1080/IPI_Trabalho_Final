@@ -7,7 +7,7 @@ close all;
 clear all; 
 clc;
 
-RGB = imread('folder.jpg');
+RGB = imread('on1gtSW.jpg');
 
 figure
 imshow(RGB)
@@ -99,8 +99,8 @@ nivel_2_novo = idwt2(novo_cAprox_aux, novo_cHor_aux, novo_cVer_aux, novo_cDiag_a
 Imagem_aux(1:x/2, 1:y/2, : ) = nivel_2_novo;
 
 %Recuperando Cb e Cr da imagem
-Cb = imresize(Cb, [x y]);
-Cr = imresize(Cr, [x y]);
+Cb = imresize(novo_cHor, [x y]);
+Cr = imresize(novo_cVer, [x y]);
 
 %Usando a transformada inversa
 novo_cHor = zeros(size(novo_cHor));
@@ -113,19 +113,19 @@ imshow(Y/255)
 title('Y');
 
 figure
-imshow(novo_cHor)
+imshow(novo_cHor,[])
 title('novo_cHor');
 % sai bem escuro
 figure
-imshow(novo_cVer)
+imshow(novo_cVer,[])
 title('novo_cVer');
 % tanto o equivalente do Cb como o do Cr
 
 [x_1, y_1, z_1] = size(RGB);
 
 Y = imresize(Y, [x_1 y_1]);
-Cb = imresize(Cb, [x_1 y_1]);
-Cr = imresize(Cr, [x_1 y_1]);
+Cb = imresize(Cb, [x_1 y_1])*255;
+Cr = imresize(Cr, [x_1 y_1])*255;
 
 RGB(:, :, 1) = Y;
 RGB(:, :, 2) = Cb;
@@ -135,7 +135,7 @@ RGB(:, :, 3) = Cr;
 RGB = ycbcr2rgb(RGB);
 
 figure
-imshow(RGB)
+imshow(RGB,[])
 title('imagem final');
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
